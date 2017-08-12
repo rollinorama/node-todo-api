@@ -17,6 +17,11 @@ const todoSchema = new mongoose.Schema({
     }
 })
 
-var Todo = mongoose.model('Todo', todoSchema);
+if(process.env.NODE_ENV === 'test'){
+    var Todo = mongoose.model('TodoTest', todoSchema); 
+} else {
+    var Todo = mongoose.model('Todo', todoSchema);
+}
+
 
 module.exports = {Todo};

@@ -8,6 +8,7 @@ var port = process.env.PORT || 3000;
 
 var app = express();
 
+
 app.use(bodyParser.json());
 
 app.post('/todos', (req, res) => {
@@ -23,5 +24,8 @@ app.post('/todos', (req, res) => {
 })
 
 app.listen(port, () => {
+    console.log(process.env.NODE_ENV);
     console.log(`Server running on port ${port}`);
 });
+
+module.exports = { app };
