@@ -23,6 +23,14 @@ app.post('/todos', (req, res) => {
     })
 })
 
+app.get('/todos', (req, res) => {
+    Todo.find().then((todos) => {
+        res.send({ todos });
+    }, err => {
+        res.status(400).send(err);
+    })
+})
+
 app.listen(port, () => {
     console.log(process.env.NODE_ENV);
     console.log(`Server running on port ${port}`);
