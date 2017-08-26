@@ -92,13 +92,38 @@ describe('Todo API', () => {
                 .get(`/todos/${id}`)
                 .expect(404)
                 .end(done);
-        })
+        });
         it('Should get a 404 when get todo with wrong id', done => {
             const id = '123';
             request(app)
                 .get(`/todos/${id}`)
                 .expect(404)
                 .end(done);
-        })
-    })
+        });
+    });
+
+    describe('DELETE /todos/:id', () => {
+        it('Should delete one todo by ID', done => {
+            Todo.findOne({ text: 'First todo test' }).then(todo => {
+                request(app)
+                    .delete(`/todos/${todo._id}`)
+                    .expect(200)
+                    .end(done);
+            }, err => console.log(err));
+        });
+        it('Should get a 404 when get todo with valid but not existing id', done => {
+            const id = new ObjectID().toHexString;
+            request(app)
+                .delete(`/todos/${id}`)
+                .expect(404)
+                .end(done);
+        });
+        it('Should get a 404 when delete todo with wrong id', done => {
+            const id = '123';
+            request(app)
+                .delete(`/todos/${id}`)
+                .expect(404)
+                .end(done);
+        });
+    });
 })
