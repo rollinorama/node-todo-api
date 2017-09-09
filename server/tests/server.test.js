@@ -12,7 +12,9 @@ const todos = [{
     text: 'First todo test'
 }, {
     _id: new ObjectID,
-    text: 'Second todo test'
+    text: 'Second todo test',
+    completed: true,
+    completedAt: new Date().getTime()
 }]
 
 beforeEach(done => {
@@ -124,19 +126,57 @@ describe('Todo API', () => {
                     }).catch(err => done(err));
                 });
         }, err => console.log(err));
+        it('Should get a 404 when get todo with valid but not existing id', done => {
+            const id = new ObjectID().toHexString;
+            request(app)
+                .delete(`/todos/${id}`)
+                .expect(404)
+                .end(done);
+        });
+        it('Should get a 404 when delete todo with wrong id', done => {
+            const id = '123';
+            request(app)
+                .delete(`/todos/${id}`)
+                .expect(404)
+                .end(done);
+        });
     });
-    // it('Should get a 404 when get todo with valid but not existing id', done => {
-    //     const id = new ObjectID().toHexString;
-    //     request(app)
-    //         .delete(`/todos/${id}`)
-    //         .expect(404)
-    //         .end(done);
-    // });
-    // it('Should get a 404 when delete todo with wrong id', done => {
-    //     const id = '123';
-    //     request(app)
-    //         .delete(`/todos/${id}`)
-    //         .expect(404)
-    //         .end(done);
-    // });
+
+    describe('PATCH /todos/:id', () => {
+        it('Should update the todo', done => {
+            const itemId = todos[0]._id.toHexString();
+            const itemBody = {
+                text: "PATCH Test",
+                completed: true
+            }
+            request(app)
+                .patch(`/todos/${itemId}`)
+                .set('Accept', 'application/json')
+                .send(itemBody)
+                .expect(200)
+                .expect(res => {
+                    expect(res.body.todo.text).toBe(itemBody.text);
+                    expect(res.body.todo.completed).toBe(true);
+                    expect(res.body.todo.completedAt).toBeA('number');
+                })
+                .end(done);
+        });
+        it('Should clear completedAt when todo is not completed', done => {
+            const itemId = todos[1]._id.toHexString();
+            const itemBody = {
+                text: "PATCH Test false",
+                completed: false
+            }
+            request(app)
+                .patch(`/todos/${itemId}`)
+                .set('Accept', 'application/json')
+                .send(itemBody)
+                .expect(res => {
+                    expect(res.body.todo.text).toBe(itemBody.text);
+                    expect(res.body.todo.completed).toBe(false);
+                    expect(res.body.todo.completedAt).toNotExist();
+                })
+                .end(done);
+        })
+    });
 });
