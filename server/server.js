@@ -12,9 +12,9 @@ var { User } = require('./models/user.js');
 var app = express();
 const port = process.env.PORT;
 
-
 app.use(bodyParser.json());
 
+/** TODOS API **/
 app.post('/todos', (req, res) => {
     var todo = new Todo({
         text: req.body.text,
@@ -47,7 +47,6 @@ app.get('/todos/:id', (req, res) => {
         res.send({ todo });
     }, err => res.status(400).send());
 });
-
 
 app.delete('/todos/:id', (req, res) => {
     const id = req.params.id;
@@ -82,6 +81,22 @@ app.patch('/todos/:id', (req, res) => {
         res.send({ todo });
     }, err => res.status(400).send());
 })
+/** END TODOS **/
+
+/** USERS API **/
+app.post('/users', (req, res) => {
+    let body = _.pick(req.body, ['email', 'password']);
+    let user = new User(body);
+
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then(token => {
+        res.header('x-auth', token).send(user);
+    }).catch(err => {
+        res.status(400).send(err);
+    });
+})
+/** END TODOS **/
 
 app.listen(port, () => {
     console.log(`Server running at port ${port}`);
