@@ -8,6 +8,8 @@ const _ = require('lodash');
 var { mongoose } = require('./db/mongoose.js');
 var { Todo } = require('./models/todo.js');
 var { User } = require('./models/user.js');
+const Authenticate = require('./middleware/Authenticate');
+const authenticate = new Authenticate;
 
 var app = express();
 const port = process.env.PORT;
@@ -95,8 +97,12 @@ app.post('/users', (req, res) => {
     }).catch(err => {
         res.status(400).send(err);
     });
+});
+
+app.get('/users/me', authenticate.user, (req, res) => {
+    res.send(req.user);
 })
-/** END TODOS **/
+/** END USERS **/
 
 app.listen(port, () => {
     console.log(`Server running at port ${port}`);
